@@ -1,6 +1,3 @@
-Awesome 🔥
-Here’s a **clean, professional, npm-ready `README.md`** you can copy-paste directly.
-This is written exactly how **real CLI tools** present themselves.
 
 ---
 
