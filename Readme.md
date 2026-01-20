@@ -1,16 +1,4 @@
-You’re right 👍 — what you have is **good content**, but it reads more like a **blog README**, not a **typical npm CLI README**.
 
-npm package READMEs are usually:
-
-* Shorter
-* Command-first
-* Very practical
-* Minimal emojis
-* Clear “Quick Start” at the top
-
-Below is a **proper npm-style README** (similar to `create-vite`, `create-next-app`, etc.).
-
-You can **replace your README.md with this** 👇
 
 ---
 
