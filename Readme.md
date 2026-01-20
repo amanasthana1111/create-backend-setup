@@ -1,6 +1,4 @@
 
-
-````md
 # create-backend-setup
 
 Interactive CLI to scaffold a production-ready backend project.
