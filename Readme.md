@@ -71,6 +71,11 @@ my-backend-app/
 ```
 
 ---
+## Keywords
+
+create-backend-setup, backend-setup, create-backend, backend-generator, backend-cli, backend-scaffold, node-backend, express-backend, api-backend, typescript-backend, prisma-backend, postgres-backend, mongodb-backend, cli-tool, npx, nodejs, express, typescript, prisma, postgresql, mongodb, zod
+
+---
 
 ## Prisma Notes
 
