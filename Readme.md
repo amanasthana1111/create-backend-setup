@@ -107,13 +107,6 @@ npx prisma migrate dev
 * Node.js >= 18
 * npm >= 9
 
----
-
-## License
-
-ISC
-
-````
 
 ---
 
