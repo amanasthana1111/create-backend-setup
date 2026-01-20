@@ -1,7 +1,4 @@
 
----
-
-````md
 # create-backend-setup 🚀
 
 Scaffold a **production-ready backend** in seconds using a simple interactive CLI.
