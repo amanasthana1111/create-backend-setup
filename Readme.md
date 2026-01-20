@@ -1,68 +1,83 @@
+You’re right 👍 — what you have is **good content**, but it reads more like a **blog README**, not a **typical npm CLI README**.
 
-# create-backend-setup 🚀
+npm package READMEs are usually:
 
-Scaffold a **production-ready backend** in seconds using a simple interactive CLI.
+* Shorter
+* Command-first
+* Very practical
+* Minimal emojis
+* Clear “Quick Start” at the top
 
-No global installs. No boilerplate headaches.
+Below is a **proper npm-style README** (similar to `create-vite`, `create-next-app`, etc.).
 
----
-
-## ✨ Features
-
-- 📦 Express.js setup
-- 🔒 CORS configuration
-- 🧠 TypeScript support
-- 🗄️ Database setup with Prisma
-  - PostgreSQL (Prisma)
-  - MongoDB
-- ✅ Zod for validation
-- ⚡ Ready-to-run project structure
+You can **replace your README.md with this** 👇
 
 ---
 
-## 📦 Usage (Recommended)
+````md
+# create-backend-setup
 
-Run directly using **npx** (no installation required):
+Interactive CLI to scaffold a production-ready backend project.
+
+---
+
+## Quick Start
 
 ```bash
 npx create-backend-setup
 ````
 
-Or using npm init shortcut:
+Or using npm init:
 
 ```bash
 npm init backend-setup
 ```
 
+No global installation required.
+
 ---
 
-## 🧭 Interactive Prompts
+## What it does
 
-The CLI will ask you:
+`create-backend-setup` generates a backend project based on your choices, including:
+
+* Express.js setup
+* Optional CORS configuration
+* TypeScript support
+* Database setup
+
+  * PostgreSQL with Prisma
+  * MongoDB
+* Zod-based request validation
+* Clean, scalable folder structure
+
+---
+
+## Prompts
+
+During setup, you will be asked:
 
 * Project name
 * Whether to use Express
 * Whether to enable CORS
 * Whether to use TypeScript
-* Database ORM choice (Prisma / MongoDB)
+* Database choice (Prisma / MongoDB)
 * Whether to include Zod
-
-Based on your answers, it generates a fully configured backend project.
 
 ---
 
-## 📁 Generated Project Structure (Example)
+## Generated Structure (example)
 
 ```txt
 my-backend-app/
-src/
-| ├─ config/
-| ├─ controllers/
-| ├─ middlewares/
-| ├─ models/
-| ├─ routes/
-| ├─ validators/
-| └─ index.ts  
+├─ src/
+│  ├─ config/
+│  ├─ controllers/
+│  ├─ middlewares/
+│  ├─ models/
+│  ├─ routes/
+│  ├─ validators/
+│  └─ index.ts
 ├─ prisma/
 │  └─ schema.prisma
 ├─ prisma.config.ts
@@ -73,70 +88,61 @@ src/
 
 ---
 
-## 🗄️ Prisma (Important Note)
+## Prisma Notes
 
 This project uses **Prisma v7+**.
 
-* Database URLs are defined in `prisma.config.ts`
-* Runtime connection is handled in `PrismaClient`
-* `schema.prisma` contains **no secrets**
-
-This follows the latest Prisma best practices.
+* Database URLs are configured in `prisma.config.ts`
+* `schema.prisma` does not contain connection strings
+* Runtime connection is handled via `PrismaClient`
 
 ---
 
-## 🛠️ After Generation
-
-Move into your project:
+## After setup
 
 ```bash
 cd my-backend-app
+npm run dev
 ```
 
-Run development server or migrations as needed:
+For Prisma migrations:
 
 ```bash
-npm run dev
 npx prisma migrate dev
 ```
 
 ---
 
-## ❓ Why `npx` and not `npm install`?
-
-This is a **one-time project generator**, similar to:
-
-* `create-react-app`
-* `create-next-app`
-* `create-vite`
-
-So you should use:
-
-```bash
-npx create-backend-setup
-```
-
----
-
-## 📌 Requirements
+## Requirements
 
 * Node.js >= 18
 * npm >= 9
 
 ---
 
-## 📄 License
+## License
 
 ISC
 
----
-
-## ⭐ Support
-
-If you find this useful, consider starring the project or sharing it 🚀
-Happy coding!
-
-
+````
 
 ---
 
+## Why this looks more like a “real npm package”
+
+✅ Command-first (`npx` at the top)  
+✅ Minimal emojis (npm prefers clean docs)  
+✅ Short sections  
+✅ No marketing language  
+✅ Similar structure to popular CLIs  
+
+---
+
+## Final step (important)
+
+After updating README:
+
+```bash
+npm version patch
+npm publish
+````
