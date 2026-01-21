@@ -1,43 +1,50 @@
-
+````md
 # create-backend-setup
 
-Interactive CLI to scaffold a production-ready backend project.
+Interactive CLI to scaffold a production-ready backend project with a clean, scalable structure.
 
 ---
 
-## Quick Start
+## 🚀 Quick Start
+
+Using **npx** (recommended):
 
 ```bash
-npx create-backend-setup
+npx create-backend-setup@latest
 ````
 
-Or using npm init:
+Or using **npm init**:
 
 ```bash
-npm init backend-setup
+npm init backend-setup@latest
 ```
 
 No global installation required.
 
 ---
 
-## What it does
+## 📦 What it does
 
 `create-backend-setup` generates a backend project based on your choices, including:
 
 * Express.js setup
 * Optional CORS configuration
 * TypeScript support
+* Authentication utilities
+
+  * bcrypt
+  * jsonwebtoken (JWT)
 * Database setup
 
   * PostgreSQL with Prisma
-  * MongoDB
+  * MongoDB with Mongoose
 * Zod-based request validation
+* Environment variable configuration
 * Clean, scalable folder structure
 
 ---
 
-## Prompts
+## 🧩 Prompts
 
 During setup, you will be asked:
 
@@ -45,86 +52,151 @@ During setup, you will be asked:
 * Whether to use Express
 * Whether to enable CORS
 * Whether to use TypeScript
-* Database choice (Prisma / MongoDB)
+* Database choice (PostgreSQL with Prisma / MongoDB with Mongoose)
 * Whether to include Zod
+* Whether to include bcrypt
+* Whether to include jsonwebtoken
 
 ---
 
-## Generated Structure (example)
+## 📁 Generated Structure (example)
 
 ```txt
 my-backend-app/
 ├─ src/
 │  ├─ config/
+│  │  └─ db.ts
 │  ├─ controllers/
 │  ├─ middlewares/
+│  │  └─ Auth.ts
 │  ├─ models/
 │  ├─ routes/
 │  ├─ validators/
 │  └─ index.ts
 ├─ prisma/
 │  └─ schema.prisma
-├─ prisma.config.ts
 ├─ .env
 ├─ package.json
 └─ tsconfig.json
 ```
 
 ---
-## Keywords
 
-create-backend-setup, backend-setup, create-backend, backend-generator, backend-cli, backend-scaffold, node-backend, express-backend, api-backend, typescript-backend, prisma-backend, postgres-backend, mongodb-backend, cli-tool, npx, nodejs, express, typescript, prisma, postgresql, mongodb, zod
+## 🔐 Authentication
+
+If selected, the project includes:
+
+* `bcrypt` for password hashing
+* `jsonwebtoken` for JWT-based authentication
+* A ready-to-use `Auth` middleware for protected routes
+
+Example usage:
+
+```ts
+import { UserAuth } from "./middlewares/Auth.js";
+
+app.get("/protected", UserAuth, (req, res) => {
+  res.json({ success: true });
+});
+```
 
 ---
 
-## Prisma Notes
+## 🌱 Environment Variables
 
-This project uses **Prisma v7+**.
+A `.env` file is generated automatically.
 
-* Database URLs are configured in `prisma.config.ts`
-* `schema.prisma` does not contain connection strings
-* Runtime connection is handled via `PrismaClient`
+Example:
+
+```env
+PORT=3000
+DATABASE_URL=
+MONGO_URI=
+JWT_PASS=your-secret-key
+```
 
 ---
 
-## After setup
+## 🗄 Database Notes
+
+### Prisma (PostgreSQL)
+
+* Uses **Prisma v7+**
+* Connection string is stored in environment variables
+* `schema.prisma` does not contain secrets
+* Prisma Client is initialized in `src/config/db.ts`
+
+Run migrations:
+
+```bash
+npx prisma migrate dev
+```
+
+### MongoDB (Mongoose)
+
+* Uses `mongoose`
+* Connection handled via `connectDB`
+* URI stored in `MONGO_URI`
+
+---
+
+## ▶️ Scripts
+
+Common npm scripts included:
+
+```bash
+npm run dev      # build and start server
+npm run build    # compile TypeScript
+npm start        # run compiled output
+```
+
+Additional Prisma scripts (if selected):
+
+```bash
+npm run prisma:generate
+npm run prisma:migrate
+```
+
+---
+
+## ▶️ After setup
 
 ```bash
 cd my-backend-app
 npm run dev
 ```
 
-For Prisma migrations:
-
-```bash
-npx prisma migrate dev
-```
+Server will start on the port defined in `.env`.
 
 ---
 
-## Requirements
+## 📋 Requirements
 
 * Node.js >= 18
 * npm >= 9
 
+---
+
+## 🤝 Contributing
+
+Pull requests are welcome.
+
+1. Fork the repository
+2. Create a feature branch
+3. Commit your changes
+4. Open a pull request
 
 ---
 
-## Why this looks more like a “real npm package”
+## 📄 License
 
-✅ Command-first (`npx` at the top)  
-✅ Minimal emojis (npm prefers clean docs)  
-✅ Short sections  
-✅ No marketing language  
-✅ Similar structure to popular CLIs  
+ISC
 
 ---
 
-## Final step (important)
+## 🔑 Keywords
 
-After updating README:
+create-backend-setup, backend-setup, create-backend, backend-generator, backend-cli, backend-scaffold, node-backend, express-backend, api-backend, typescript-backend, prisma-backend, postgres-backend, mongodb-backend, auth-backend, bcrypt, jsonwebtoken, jwt-auth, cli-tool, npx, nodejs, express, typescript, prisma, postgresql, mongodb, zod
 
-```bash
-npm version patch
-npm publish
-````
+```
+```
