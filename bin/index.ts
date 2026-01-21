@@ -5,15 +5,21 @@ import { execa } from "execa";
 import fs from "fs-extra";
 import path from "path";
 
-
 type PromptAnswers = {
   projectName: string;
 };
+
+const writeIfNotExists = async (filePath: string, content: string) => {
+  if (!(await fs.pathExists(filePath))) {
+    await fs.writeFile(filePath, content);
+  }
+};
+
 async function run() {
   const cwd = process.cwd();
 
   /* -------- PROJECT NAME -------- */
-  const { projectName }= await inquirer.prompt<PromptAnswers>([
+  const { projectName } = await inquirer.prompt<PromptAnswers>([
     {
       type: "input",
       name: "projectName",
@@ -48,7 +54,7 @@ async function run() {
     {
       type: "confirm",
       name: "express",
-      message: "Do you want to use  Express?",
+      message: "Do you want to use Express?",
       default: true,
     },
     {
@@ -76,6 +82,18 @@ async function run() {
       message: "Do you want to use Zod?",
       default: true,
     },
+    {
+      type: "confirm",
+      name: "bcrypt",
+      message: "Do you want to use bcrypt?",
+      default: true,
+    },
+    {
+      type: "confirm",
+      name: "jsonwebtoken",
+      message: "Do you want to use jsonwebtoken?",
+      default: true,
+    },
   ]);
 
   /* -------- FOLDERS -------- */
@@ -92,23 +110,24 @@ async function run() {
   for (const dir of dirs) {
     await fs.ensureDir(dir);
   }
+  console.log("Files are Created");
 
   /* -------- FILES -------- */
-  await fs.writeFile(
-    "src/index.ts",
-    `
+
+  if (answers.express || answers.typescript) {
+    await writeIfNotExists(
+      "src/index.ts",
+      `
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 // import {connectDB} from "./config/db.js" FOR M-DB
-//import { prismaDB } from "./config/db.js"; FOR P-DB
-
+// import { prismaDB } from "./config/db.js"; FOR P-DB
 
 dotenv.config();
 
 const app = express();
-
 
 app.use(cors({ origin: true, credentials: true }));
 app.use(express.json());
@@ -116,23 +135,23 @@ app.use(cookieParser());
 
 const PORT = process.env.PORT || 3000;
 
+const main = async () => {
+  // await connectDB();
+  app.listen(PORT, () => {
+    console.log(\`🚀 Server running on port \${PORT}\`);
+  });
+};
 
-const main = async()=>{
-    // await connectDB(); if u use monodb . if not remove that line
-    app.listen(PORT, () => {
-  console.log(\`🚀 Server running on port \${PORT}\`);
-});
-    }
 main();
-
-
 `.trim(),
-  );
+    );
+  }
 
-  await fs.writeFile(
-    "src/controllers/Status.ts",
-    `
-   import type { Request, Response } from "express";
+  if (answers.express) {
+    await writeIfNotExists(
+      "src/controllers/Status.ts",
+      `
+import type { Request, Response } from "express";
 
 const Status = async (req: Request, res: Response) => {
   res.json({
@@ -143,13 +162,13 @@ const Status = async (req: Request, res: Response) => {
 
 export { Status };
 `.trim(),
-  );
+    );
 
-  await fs.writeFile(
-    "src/routes/index.ts",
-    `
+    await writeIfNotExists(
+      "src/routes/index.ts",
+      `
 import { Router } from "express";
-import {Status} from "../controllers/Status.js"
+import { Status } from "../controllers/Status.js";
 
 const router = Router();
 
@@ -157,11 +176,47 @@ router.get("/health", Status);
 
 export default router;
 `.trim(),
-  );
+    );
+  }
+ if (answers.jsonwebtoken) {
+    await writeIfNotExists(
+      "src/middlewares/Auth.ts",
+      `
+import type { Request, Response, NextFunction } from "express";
+import jwt from "jsonwebtoken";
 
-  await fs.writeFile(".env", `PORT=3000\nDATABASE_URL=\nMONGO_URI=\n`);
 
-  await fs.writeFile(
+export const UserAuth = (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const token: string | undefined = req.cookies?.token;
+
+    if (!token) {
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized",
+      });
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_PASS);
+    // @ts-ignore
+    req.userId = decoded.userId;
+
+    next();
+  } catch {
+    return res.status(401).json({
+      success: false,
+      message: "Invalid or expired token",
+    });
+  }
+};
+
+`.trim(),
+    );
+
+  }
+  await writeIfNotExists(".env", `PORT=3000\nDATABASE_URL=\nMONGO_URI=\n`);
+
+  await writeIfNotExists(
     "tsconfig.json",
     JSON.stringify(
       {
@@ -185,18 +240,19 @@ export default router;
 
   /* -------- DEPENDENCIES -------- */
   const deps = ["cookie-parser", "dotenv"];
-  const devDeps = [];
+  const devDeps: string[] = [];
 
   if (answers.express) deps.push("express");
   if (answers.cors) deps.push("cors");
   if (answers.zod) deps.push("zod");
-  console.log("DB ANSWER:", answers.database);
+  if (answers.bcrypt) deps.push("bcrypt");
+  if (answers.jsonwebtoken) deps.push("jsonwebtoken");
 
-  if (answers.database.includes("MongoDB (Mongoose)")) {
+  if (answers.database.includes("MongoDB")) {
     deps.push("mongoose");
   }
 
-  if (answers.database.includes("PostgreSQL (Prisma)")) {
+  if (answers.database.includes("Prisma")) {
     deps.push("@prisma/client");
     devDeps.push("prisma");
   }
@@ -214,22 +270,18 @@ export default router;
 
   await execa("npm", ["init", "-y"], { stdio: "inherit" });
   await execa("npm", ["install", ...deps], { stdio: "inherit" });
-  if (devDeps.length)
+
+  if (devDeps.length) {
     await execa("npm", ["install", "-D", ...devDeps], { stdio: "inherit" });
-  // ---------------- PACKAGE.JSON SETUP ----------------
+  }
 
+  /* -------- PACKAGE.JSON SETUP -------- */
   const pkgPath = "package.json";
-
-  // read existing package.json
   const pkg = await fs.readJSON(pkgPath);
 
-  // set package name from project name (important for npm scripts)
   pkg.name = projectName === "." ? "backend-app" : projectName;
-
-  // ESM support
   pkg.type = "module";
 
-  // scripts
   pkg.scripts = {
     dev: "tsc -b && node ./dist/index.js",
     build: "tsc",
@@ -240,7 +292,6 @@ export default router;
     }),
   };
 
-  // write back
   await fs.writeJSON(pkgPath, pkg, { spaces: 2 });
 
   console.log("📦 package.json configured");
@@ -249,7 +300,7 @@ export default router;
   if (answers.database.includes("Prisma")) {
     await execa("npx", ["prisma", "init"], { stdio: "inherit" });
 
-    await fs.writeFile(
+    await writeIfNotExists(
       "src/config/db.ts",
       `
 import { PrismaClient } from "@prisma/client";
@@ -257,7 +308,7 @@ export const prismaDB = new PrismaClient();
 `.trim(),
     );
   } else {
-    await fs.writeFile(
+    await writeIfNotExists(
       "src/config/db.ts",
       `
 import mongoose from "mongoose";
@@ -270,10 +321,9 @@ export const connectDB = async () => {
     );
   }
 
-  /* ---------------- ZOD ---------------- */
-
+  /* -------- ZOD -------- */
   if (answers.zod) {
-    await fs.writeFile(
+    await writeIfNotExists(
       "src/validators/example.schema.ts",
       `
 import { z } from "zod";
