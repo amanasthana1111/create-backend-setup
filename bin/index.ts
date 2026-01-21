@@ -258,15 +258,18 @@ export const UserAuth = (req: Request, res: Response, next: NextFunction) => {
   }
 
   if (answers.typescript) {
-    devDeps.push(
-      "typescript",
-      "ts-node-dev",
-      "@types/node",
-      "@types/express",
-      "@types/cors",
-      "@types/cookie-parser",
-    );
-  }
+  devDeps.push(
+    "typescript",
+    "ts-node-dev",
+    "@types/node",
+    "@types/express",
+    "@types/cors",
+    "@types/cookie-parser",
+    "@types/bcrypt",
+    "@types/jsonwebtoken"
+  );
+}
+
 
   await execa("npm", ["init", "-y"], { stdio: "inherit" });
   await execa("npm", ["install", ...deps], { stdio: "inherit" });
