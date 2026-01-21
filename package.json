@@ -1,6 +1,6 @@
 {
   "name": "create-backend-setup",
-  "version": "1.0.11",
+  "version": "1.0.12",
   "type": "module",
   "bin": {
     "create-backend-setup": "./dist/bin/index.js"
@@ -13,7 +13,6 @@
     "bin",
     "README.md",
     "LICENSE"
-
   ],
   "license": "MIT",
   "bugs": "https://github.com/amanasthana1111/create-backend-setup/issues",
