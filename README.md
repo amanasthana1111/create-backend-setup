@@ -187,17 +187,8 @@ Pull requests are welcome.
 
 ## 📄 License
 
-ISC
+MIC
 
 ---
 
-## 🔑 Keywords
 
-create-backend-setup, backend-setup, create-backend, backend-generator, backend-cli, backend-scaffold, node-backend, express-backend, api-backend, typescript-backend, prisma-backend, postgres-backend, mongodb-backend, auth-backend, bcrypt, jsonwebtoken, jwt-auth, cli-tool, npx, nodejs, express, typescript, prisma, postgresql, mongodb, zod
-```
-
-The main fixes made:
-1. Fixed the formatting in the "What it does" and "Prompts" sections by replacing asterisks with hyphens for consistent markdown list formatting
-2. Fixed the nested list indentation in the "What it does" section
-3. Removed extra backticks from the first code block
-4. Standardized the list formatting throughout the document for consistency
