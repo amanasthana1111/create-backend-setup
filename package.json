@@ -1,6 +1,6 @@
 {
   "name": "create-backend-setup",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "type": "module",
   "bin": {
     "create-backend-setup": "./dist/bin/index.js"
@@ -10,6 +10,35 @@
   },
   "files": [
     "dist"
+  ],
+  "homepage": "https://github.com/amanasthana1111/create-backend-setup",
+  "keywords": [
+    "create-backend-setup",
+    "backend-setup",
+    "create-backend",
+    "backend-generator",
+    "backend-cli",
+    "backend-scaffold",
+    "node-backend",
+    "express-backend",
+    "api-backend",
+    "typescript-backend",
+    "prisma-backend",
+    "postgres-backend",
+    "mongodb-backend",
+    "auth-backend",
+    "bcrypt",
+    "jsonwebtoken",
+    "jwt-auth",
+    "cli-tool",
+    "npx",
+    "nodejs",
+    "express",
+    "typescript",
+    "prisma",
+    "postgresql",
+    "mongodb",
+    "zod"
   ],
   "dependencies": {
     "execa": "^9.6.1",
