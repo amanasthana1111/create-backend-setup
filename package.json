@@ -1,6 +1,6 @@
 {
   "name": "create-backend-setup",
-  "version": "1.0.12",
+  "version": "1.0.13",
   "type": "module",
   "bin": {
     "create-backend-setup": "./dist/bin/index.js"
