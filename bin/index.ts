@@ -124,7 +124,7 @@ import cookieParser from "cookie-parser";
 // import {connectDB} from "./config/db.js" FOR M-DB
 // import { prismaDB } from "./config/db.js"; FOR P-DB
 
-dotenv.config();
+import 'dotenv/config'
 
 const app = express();
 
@@ -308,19 +308,26 @@ export const UserAuth = (req: Request, res: Response, next: NextFunction) => {
   console.log("📦 package.json configured");
 
   /* -------- DATABASE -------- */
-  if (answers.database.includes("Prisma")) {
-    await execa("npx", ["prisma", "init"], { stdio: "inherit" });
+/* -------- DATABASE -------- */
+if (answers.database.includes("Prisma")) {
+  await execa("npx", ["prisma", "init"], { stdio: "inherit" });
 
-    await writeIfNotExists(
-      "src/config/db.ts",
-      `
+  // Prisma Client
+  await writeIfNotExists(
+    "src/config/db.ts",
+    `
 import { PrismaClient } from "@prisma/client";
-export const prismaDB = new PrismaClient();
-`.trim(),
-    );
-    await writeIfNotExists(
-      "prisma/schema.prisma",
-      `
+
+export const prismaDB = new PrismaClient({
+  datasourceUrl: process.env.DATABASE_URL,
+});
+`.trim()
+  );
+
+  // Prisma Schema (v7 compatible)
+  await writeIfNotExists(
+    "prisma/schema.prisma",
+    `
 generator client {
   provider = "prisma-client-js"
 }
@@ -328,34 +335,54 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
-//   model User {
-//   id        Int      @id @default(autoincrement())
-//   username  String   @unique
-//   name      String
-//   email     String   @unique
-//   password  String
 
-//   createdAt DateTime @default(now())
-//   updatedAt DateTime @updatedAt
-// }
+model User {
+  id        Int      @id @default(autoincrement())
+  username  String   @unique
+  name      String
+  email     String   @unique
+  password  String
 
-`.trim(),
-    );
-  } else {
-    await writeIfNotExists(
-      "src/config/db.ts",
-      `
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+`.trim()
+  );
+
+  // Prisma config (NEW in v7)
+  await writeIfNotExists(
+    "prisma.config.ts",
+    `
+import { defineConfig } from "prisma/config";
+
+export default defineConfig({
+  migrate: {
+    datasource: "db",
+  },
+});
+`.trim()
+  );
+} else {
+  // MongoDB
+  await writeIfNotExists(
+    "src/config/db.ts",
+    `
 import mongoose from "mongoose";
 
 export const connectDB = async () => {
-  await mongoose.connect(process.env.MONGO_URI!);
+  if (!process.env.MONGO_URI) {
+    throw new Error("MONGO_URI is missing");
+  }
+
+  await mongoose.connect(process.env.MONGO_URI);
   console.log("MongoDB connected");
 };
-`.trim(),
-    );
-    await writeIfNotExists(
-      "src/models/UserSchema",
-      `
+`.trim()
+  );
+
+  await writeIfNotExists(
+    "src/models/User.ts",
+    `
 import mongoose, { Schema, Document } from "mongoose";
 
 export interface IUser extends Document {
@@ -367,39 +394,19 @@ export interface IUser extends Document {
 
 const UserSchema = new Schema<IUser>(
   {
-    username: {
-      type: String,
-      required: true,
-      unique: true,
-      trim: true,
-    },
-    name: {
-      type: String,
-      required: true,
-    },
-    email: {
-      type: String,
-      required: true,
-      unique: true,
-      lowercase: true,
-    },
-    password: {
-      type: String,
-      required: true,
-    },
+    username: { type: String, required: true, unique: true },
+    name: { type: String, required: true },
+    email: { type: String, required: true, unique: true },
+    password: { type: String, required: true },
   },
-  {
-    timestamps: true, // createdAt & updatedAt
-  }
+  { timestamps: true }
 );
 
 export const User = mongoose.model<IUser>("User", UserSchema);
+`.trim()
+  );
+}
 
-`.trim(),
-    );
-
-
-  }
 
   /* -------- ZOD -------- */
   if (answers.zod) {
