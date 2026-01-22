@@ -121,7 +121,6 @@ async function run() {
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-import dotenv from "dotenv";
 // import {connectDB} from "./config/db.js" FOR M-DB
 // import { prismaDB } from "./config/db.js"; FOR P-DB
 
@@ -178,7 +177,7 @@ export default router;
 `.trim(),
     );
   }
- if (answers.jsonwebtoken) {
+  if (answers.jsonwebtoken) {
     await writeIfNotExists(
       "src/middlewares/Auth.ts",
       `
@@ -189,7 +188,9 @@ import jwt from "jsonwebtoken";
 export const UserAuth = (req: Request, res: Response, next: NextFunction) => {
   try {
     const token: string | undefined = req.cookies?.token;
-
+    if (!process.env.JWT_PASS) {
+  throw new Error("JWT_PASS is missing");
+}
     if (!token) {
       return res.status(401).json({
         success: false,
@@ -198,9 +199,15 @@ export const UserAuth = (req: Request, res: Response, next: NextFunction) => {
     }
 
     const decoded = jwt.verify(token, process.env.JWT_PASS);
+      if (!decoded || typeof decoded !== "object" || !decoded.userId) {
+      return res.status(401).json({
+        success: false,
+        message: "Invalid token",
+      });
+    }
     // @ts-ignore
     req.userId = decoded.userId;
-
+    
     next();
   } catch {
     return res.status(401).json({
@@ -212,9 +219,11 @@ export const UserAuth = (req: Request, res: Response, next: NextFunction) => {
 
 `.trim(),
     );
-
   }
-  await writeIfNotExists(".env", `PORT=3000\nDATABASE_URL=\nMONGO_URI=\n`);
+  await writeIfNotExists(
+    ".env",
+    `PORT=3000\nDATABASE_URL=\nMONGO_URI=\nJWT_PASS="my-jwt-pass"\n`,
+  );
 
   await writeIfNotExists(
     "tsconfig.json",
@@ -258,18 +267,17 @@ export const UserAuth = (req: Request, res: Response, next: NextFunction) => {
   }
 
   if (answers.typescript) {
-  devDeps.push(
-    "typescript",
-    "ts-node-dev",
-    "@types/node",
-    "@types/express",
-    "@types/cors",
-    "@types/cookie-parser",
-    "@types/bcrypt",
-    "@types/jsonwebtoken"
-  );
-}
-
+    devDeps.push(
+      "typescript",
+      "ts-node-dev",
+      "@types/node",
+      "@types/express",
+      "@types/cors",
+      "@types/cookie-parser",
+      "@types/bcrypt",
+      "@types/jsonwebtoken",
+    );
+  }
 
   await execa("npm", ["init", "-y"], { stdio: "inherit" });
   await execa("npm", ["install", ...deps], { stdio: "inherit" });
@@ -310,6 +318,29 @@ import { PrismaClient } from "@prisma/client";
 export const prismaDB = new PrismaClient();
 `.trim(),
     );
+    await writeIfNotExists(
+      "prisma/schema.prisma",
+      `
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+//   model User {
+//   id        Int      @id @default(autoincrement())
+//   username  String   @unique
+//   name      String
+//   email     String   @unique
+//   password  String
+
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
+// }
+
+`.trim(),
+    );
   } else {
     await writeIfNotExists(
       "src/config/db.ts",
@@ -322,6 +353,52 @@ export const connectDB = async () => {
 };
 `.trim(),
     );
+    await writeIfNotExists(
+      "src/models/UserSchema",
+      `
+import mongoose, { Schema, Document } from "mongoose";
+
+export interface IUser extends Document {
+  username: string;
+  name: string;
+  email: string;
+  password: string;
+}
+
+const UserSchema = new Schema<IUser>(
+  {
+    username: {
+      type: String,
+      required: true,
+      unique: true,
+      trim: true,
+    },
+    name: {
+      type: String,
+      required: true,
+    },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      lowercase: true,
+    },
+    password: {
+      type: String,
+      required: true,
+    },
+  },
+  {
+    timestamps: true, // createdAt & updatedAt
+  }
+);
+
+export const User = mongoose.model<IUser>("User", UserSchema);
+
+`.trim(),
+    );
+
+
   }
 
   /* -------- ZOD -------- */
